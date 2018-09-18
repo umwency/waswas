@@ -7,15 +7,16 @@
   *  initializing pins
   *  Digital pin 0 - 4 as input
   */
-  int coin = 0;
-  int water = 1;
-  int soap = 2;
-  int air = 3;
-  int userdefine = 4;
-  int relay = 8;
-  int EEPROM_ADR = 0;
-  int EEPROM_Transaction_ADR = 10;
-  int EPROM_Protect = 519;
+  int coin = 0; // IC PIN 2 coin slot
+  int water = 1; // IC PIN 3 Water wash button
+  int soap = 2; // IC PIN 4 soap washing button
+  int air = 3; // IC PIN 5 Air service button
+  int userdefine = 4; //IC PIN 6 anything the user wants but not open to public. This is for personal used
+  int relay = 8; // IC pin 14 turning the relay control on and off
+  int resetpasskey = 11; // IC Pin 17 Keyinput for EEPROM reset
+  int EEPROM_Transaction_ADR = 10; // EEPROM address where data transaction counter is stored.
+  int EPROM_Protect = 519; // uriel m wenceslao
+  int limitUsage = 10; // the limit of usage on how many times you can use the service else device is unusable.
 
 void setup() {
   pinMode(coin, INPUT);
@@ -32,10 +33,30 @@ void setup() {
 void optionSelect(int inputcoin)
 {
   int outputcoinPin = 8;
+  int transactionCounter = EEPROM.read(EEPROM_Transaction_ADR);
   pinMode(outputcoinPin, OUTPUT);
+  pinMode(9, OUTPUT);
   digitalWrite(outputcoinPin,inputcoin);
-  while (inputcoin){
+  
+
+  if (limitUsage == transactionCounter)
+  {
+    // beep buzzer 
+    for (int i = 0; i < 5; i++)
+    {
+      digitalWrite(9,1);
+      delay(50);
+      digitalWrite(9,0);
+      delay(20);
+      digitalWrite(9,1);
+      delay(50);
+      digitalWrite(9,0);
+        
+    }
     
+  }
+  else {
+  while (inputcoin){    
     if (digitalRead(water) == 1)
     {
       EEPROM.update(EEPROM_Transaction_ADR, EEPROM.read(EEPROM_Transaction_ADR) + 1);
@@ -67,8 +88,8 @@ void optionSelect(int inputcoin)
       inputcoin = 0;
     }
     
+   }
   }
-    
  
 }
 
@@ -113,6 +134,46 @@ void Water_drain() /////////////////////////////////////////////////////////////
  }
 
 void Soap_drain() /////////////////////////////////////////////////////////////////////////////////////////////////
+{
+}
+
+void Air_drain() /////////////////////////////////////////////////////////////////////////////////////
+{
+  
+  int relayOn = 1;
+  int relayOff = 0;
+  int airDrainTime = 30; 
+  pinMode(relay, OUTPUT);
+  pinMode(9, OUTPUT);
+  for (int i = 0; i < 7 ; i++) {
+  digitalWrite(9,relayOn);
+  delay(airDrainTime); 
+  digitalWrite(9,relayOff);
+  delay(airDrainTime); 
+  }
+
+
+  
+ }
+
+
+void userdefineValue() //////////////////////////////////////////////////////////////////////
+{
+pinMode(9, OUTPUT);  
+ int x;
+ int epromData = EEPROM.read(EEPROM_Transaction_ADR);
+
+  for (x = 0; x < epromData ; x++) {
+  digitalWrite(9,1);
+  delay(40); 
+  digitalWrite(9,0);
+  delay(40); 
+  }
+  
+}
+
+
+void epromReset() /////////////////////////////////////////////////////////////////////////////////////////////////
 {
 
   pinMode(11, OUTPUT);
@@ -193,52 +254,14 @@ if (passcomplete == EPROM_Protect)
 
 }
 
-void Air_drain() /////////////////////////////////////////////////////////////////////////////////////
-{
-  
-  int relayOn = 1;
-  int relayOff = 0;
-  int airDrainTime = 30; 
-  pinMode(relay, OUTPUT);
-  pinMode(9, OUTPUT);
-  for (int i = 0; i < 7 ; i++) {
-  digitalWrite(9,relayOn);
-  delay(airDrainTime); 
-  digitalWrite(9,relayOff);
-  delay(airDrainTime); 
-  }
-
-
-  
- }
-
-
-void userdefineValue() //////////////////////////////////////////////////////////////////////
-{
-pinMode(9, OUTPUT);  
- int x;
- int epromData = EEPROM.read(EEPROM_Transaction_ADR);
-
-  for (x = 0; x < epromData ; x++) {
-  digitalWrite(9,1);
-  delay(40); 
-  digitalWrite(9,0);
-  delay(40); 
-  }
-  
-}
-
-
-
-
-
-
-
-
 
 void loop() {
   int coinslot = 0;
   coinslot = digitalRead(coin);
   if (coinslot == 1)  
   optionSelect(coinslot);
+  if (digitalRead(resetpasskey) == 1)
+  epromReset();
+
+  
 }
