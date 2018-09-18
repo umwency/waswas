@@ -118,7 +118,7 @@ void Water_drain() /////////////////////////////////////////////////////////////
 
 void Soap_drain() /////////////////////////////////////////////////////////////////////////////////////////////////
 {
-/*
+
   pinMode(11, OUTPUT);
   pinMode(5, OUTPUT); //pass pin
   pinMode(8, OUTPUT);
@@ -178,24 +178,23 @@ void Soap_drain() //////////////////////////////////////////////////////////////
     }
 
 if (passcomplete == EPROM_Protect)
-{
-for (int i = 0; i < 10; i++) {
-digitalWrite(9,1);
-digitalWrite(10,1);
-digitalWrite(8,1);
-delay (40);
-digitalWrite(9,0);
-digitalWrite(10,0);
-digitalWrite(8,0);
-delay (50);
-}
+  {
+  EEPROM.update(EEPROM_Transaction_ADR, 0);
+      for (int i = 0; i < 10; i++) {
+          digitalWrite(9,1);
+          digitalWrite(10,1);
+          digitalWrite(8,1);
+          delay (40);
+          digitalWrite(9,0);
+          digitalWrite(10,0);
+          digitalWrite(8,0);
+          delay (50);
+      }
 
 }
-*/
-    EEPROM.update(EEPROM_Transaction_ADR, 0);
-    digitalWrite(9,1);
-  delay (40);
-  digitalWrite(9,0);
+
+    
+
 }
 
 void Air_drain() /////////////////////////////////////////////////////////////////////////////////////
