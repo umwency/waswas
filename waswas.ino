@@ -27,22 +27,19 @@ void setup() {
  // EEPROM.write(EEPROM_Transaction_ADR,0); // initializing transaction address on the first time.
 
  // Serial.begin(9600); 
-
-
-  pinMode(11, OUTPUT);
-  pinMode(10, OUTPUT);
-  pinMode(9, OUTPUT);
-  pinMode(8, OUTPUT);
-  pinMode(12, INPUT);
-  pinMode(13, INPUT);
 }
  
 void optionSelect(int inputcoin)
 {
+  int outputcoinPin = 8;
+  pinMode(outputcoinPin, OUTPUT);
+  digitalWrite(outputcoinPin,inputcoin);
   while (inputcoin){
+    
     if (digitalRead(water) == 1)
     {
       EEPROM.update(EEPROM_Transaction_ADR, EEPROM.read(EEPROM_Transaction_ADR) + 1);
+      digitalWrite(outputcoinPin,0);
       Water_drain();
       inputcoin = 0;
     }
@@ -50,6 +47,7 @@ void optionSelect(int inputcoin)
    if (digitalRead(soap) == 1)
     {
       EEPROM.update(EEPROM_Transaction_ADR, EEPROM.read(EEPROM_Transaction_ADR) + 1);
+      digitalWrite(outputcoinPin,0);
       Soap_drain();
       inputcoin = 0;
     }
@@ -57,12 +55,14 @@ void optionSelect(int inputcoin)
    if (digitalRead(air) == 1)
     {
       EEPROM.update(EEPROM_Transaction_ADR, EEPROM.read(EEPROM_Transaction_ADR) + 1);
+      digitalWrite(outputcoinPin,0);
       Air_drain();
       inputcoin = 0;
     }
 
      if (digitalRead(userdefine) == 1)
     {
+      digitalWrite(outputcoinPin,0);
       userdefineValue();
       inputcoin = 0;
     }
@@ -71,10 +71,6 @@ void optionSelect(int inputcoin)
     
  
 }
-
-
-
-
 
 
 void Water_drain() //////////////////////////////////////////////////////////////////////////////////////
@@ -200,38 +196,16 @@ if (passcomplete == EPROM_Protect)
 void Air_drain() /////////////////////////////////////////////////////////////////////////////////////
 {
   
-  int timePIN1 = 12;
-  int timePIN2 = 13;
   int relayOn = 1;
   int relayOff = 0;
-  
+  int airDrainTime = 30; 
   pinMode(relay, OUTPUT);
-  pinMode(timePIN1, INPUT);
-  pinMode(timePIN2, INPUT);
-  /*
-   * Pin Combinatio
-   * 0 0 - 2 minutes
-   * 0 1 - 2.5 minutes
-   * 1 0 - 3  minutes
-   * 1 1 - 3. 5 minutes
-   */
-  float delaycount = 10; // ratio of 1:1 means dealay count is the default one minute duration
-  float switchtime;
-
-  if (digitalRead(timePIN1) == 0 && digitalRead(timePIN2) == 0)
-    switchtime =  2;
-  if (digitalRead(timePIN1) == 0 && digitalRead(timePIN2) == 1)
-    switchtime = 2.5;
-  if (digitalRead(timePIN1) == 1 && digitalRead(timePIN2) == 0)
-    switchtime = 3;
-  if (digitalRead(timePIN1) == 1 && digitalRead(timePIN2) == 1)
-    switchtime = 3.5;
-  
+  pinMode(9, OUTPUT);
   for (int i = 0; i < 7 ; i++) {
   digitalWrite(9,relayOn);
-  delay(delaycount*switchtime); 
+  delay(airDrainTime); 
   digitalWrite(9,relayOff);
-  delay(delaycount); 
+  delay(airDrainTime); 
   }
 
 
