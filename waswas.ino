@@ -61,92 +61,92 @@ void setup() {
 }
  
 void optionSelect(int inputcoin)
-{
-  int transactionCounter = EEPROM.read(EEPROM_Transaction_ADR);
-  int defwater = 0,defair = 0;
-  digitalWrite(CoinIndicatorLight,inputcoin);
-  
-  if (limitUsage == transactionCounter)
   {
-    // beep buzzer 
-    for (int i = 0; i < 5; i++)
-    {
-      digitalWrite(CoinIndicatorLight,1);
-      delay(50);
-      digitalWrite(CoinIndicatorLight,0);
-      delay(20);
-      digitalWrite(CoinIndicatorLight,1);
-      delay(50);
-      digitalWrite(CoinIndicatorLight,0);        
-    }    
-  }
-  else {
-  while (inputcoin){    
-    if (digitalRead(waterPin) == 1 && inputcoin == 1)
-    {
-      if(EEPROMFlag)
-      EEPROM.update(EEPROM_Transaction_ADR, EEPROM.read(EEPROM_Transaction_ADR) + 1);
-      digitalWrite(CoinIndicatorLight,0);
-      Water_drain();
-      inputcoin = 0;
-      break;
-    }
-
-   if (digitalRead(soapPin) == 1 && inputcoin == 1)
-    {
-      if(EEPROMFlag)
-      EEPROM.update(EEPROM_Transaction_ADR, EEPROM.read(EEPROM_Transaction_ADR) + 1);
-      digitalWrite(CoinIndicatorLight,0);
-      Soap_drain();
-      inputcoin = 0;
-      break;
-    }
-
-   if (digitalRead(airPin) == 1 && inputcoin == 1)
-    {
-      if(EEPROMFlag)
-      EEPROM.update(EEPROM_Transaction_ADR, EEPROM.read(EEPROM_Transaction_ADR) + 1);
-      digitalWrite(CoinIndicatorLight,0);
-      Air_drain();
-      inputcoin = 0;
-      break;
-    }
-
-     if (digitalRead(userdefinePin) == 1)
-    {
-      if(EEPROMFlag)
-      EEPROM.update(EEPROM_Transaction_ADR, EEPROM.read(EEPROM_Transaction_ADR) + 1);
-      digitalWrite(CoinIndicatorLight,0);
-      do{
-      defwater = digitalRead(waterPin);
-      defair = digitalRead(airPin);
-      if (defwater == 1)
-        {
-          digitalWrite(CoinIndicatorLight,1);
-          break;
-        }  
-
-       if (defair == 1)
-        {
-          digitalWrite(CoinIndicatorLight,1);
-          break;
-        }  
-        
-      } while (digitalRead(userdefinePin));
-      
-      userdefineValue(defwater,defair);   
-      digitalWrite(CoinIndicatorLight,0);   
-      inputcoin = 0;
-    }
+    int transactionCounter = EEPROM.read(EEPROM_Transaction_ADR);
+    int defwater = 0,defair = 0;
+    digitalWrite(CoinIndicatorLight,inputcoin);
     
-   }
+    if (limitUsage == transactionCounter)
+      {
+      // beep buzzer 
+      for (int i = 0; i < 5; i++)
+        {
+          digitalWrite(CoinIndicatorLight,1);
+          delay(50);
+          digitalWrite(CoinIndicatorLight,0);
+          delay(20);
+          digitalWrite(CoinIndicatorLight,1);
+          delay(50);
+          digitalWrite(CoinIndicatorLight,0);        
+        }    
+      }
+    else 
+      {
+      while (inputcoin)
+        {    
+        if (digitalRead(waterPin) == 1 && inputcoin == 1)
+          {
+            if(EEPROMFlag)
+            EEPROM.update(EEPROM_Transaction_ADR, EEPROM.read(EEPROM_Transaction_ADR) + 1);
+            digitalWrite(CoinIndicatorLight,0);
+            Water_drain();
+            inputcoin = 0;
+            break;
+          }
+        
+        if (digitalRead(soapPin) == 1 && inputcoin == 1)
+          {
+            if(EEPROMFlag)
+            EEPROM.update(EEPROM_Transaction_ADR, EEPROM.read(EEPROM_Transaction_ADR) + 1);
+            digitalWrite(CoinIndicatorLight,0);
+            Soap_drain();
+            inputcoin = 0;
+            break;
+          }
+        
+        if (digitalRead(airPin) == 1 && inputcoin == 1)
+          {
+            if(EEPROMFlag)
+            EEPROM.update(EEPROM_Transaction_ADR, EEPROM.read(EEPROM_Transaction_ADR) + 1);
+            digitalWrite(CoinIndicatorLight,0);
+            Air_drain();
+            inputcoin = 0;
+            break;
+          }
+        
+        if (digitalRead(userdefinePin) == 1)
+          {
+          if(EEPROMFlag)
+          EEPROM.update(EEPROM_Transaction_ADR, EEPROM.read(EEPROM_Transaction_ADR) + 1);
+          digitalWrite(CoinIndicatorLight,0);
+            do{
+            defwater = digitalRead(waterPin);
+            defair = digitalRead(airPin);
+              if (defwater == 1)
+                {
+                  digitalWrite(CoinIndicatorLight,1);
+                  break;
+                }  
+              
+              if (defair == 1)
+                {
+                  digitalWrite(CoinIndicatorLight,1);
+                  break;
+                }  
+            
+            }while (digitalRead(userdefinePin));
+          
+          userdefineValue(defwater,defair);   
+          digitalWrite(CoinIndicatorLight,0);   
+          inputcoin = 0;
+          }        
+        }
+      }
   }
- 
-}
 
 
 void Water_drain() //////////////////////////////////////////////////////////////////////////////////////
-{
+  {
   
   int timePIN1 = 12; // pin18
   int timePIN2 = 13; //pin19
@@ -155,32 +155,43 @@ void Water_drain() /////////////////////////////////////////////////////////////
   pinMode(timePIN1, INPUT);
   pinMode(timePIN2, INPUT);
   /*
-   * Pin Combinatio
-   * 0 0 - 2 minutes
-   * 0 1 - 2.5 minutes
-   * 1 0 - 3  minutes
-   * 1 1 - 3. 5 minutes
-   */
+  * Pin Combinatio
+  * 0 0 - 2 minutes
+  * 0 1 - 2.5 minutes
+  * 1 0 - 3  minutes
+  * 1 1 - 3. 5 minutes
+  */
   float delaycount = 10; // ratio of 1:1 means dealay count is the default one minute duration
   float switchtime;
-
+  
   if (digitalRead(timePIN1) == 0 && digitalRead(timePIN2) == 0)
     switchtime =  1;
   if (digitalRead(timePIN1) == 0 && digitalRead(timePIN2) == 1)
     switchtime = 5;
   if (digitalRead(timePIN1) == 1 && digitalRead(timePIN2) == 0)
-    switchtime = 10;
+   switchtime = 10;
   if (digitalRead(timePIN1) == 1 && digitalRead(timePIN2) == 1)
     switchtime = 15;
   
-  for (int i = 0; i < 7 ; i++) {
-  digitalWrite(relayWater,relayOn);
-  delay(delaycount*switchtime); 
-  digitalWrite(relayWater,relayOff);
-  delay(delaycount); 
+  // Turning On Solinoid A0  and A4
+  digitalWrite(solinoid_WaterOut_WaterWash,1); //A1
+  delay(10);
+  digitalWrite(solinoid_WaterIn_from_waterTank,1); //A4
+  delay(10);
+  for (int i = 0; i < 7 ; i++)
+    {
+      digitalWrite(relayWater,relayOn);
+      delay(delaycount*switchtime); 
+      digitalWrite(relayWater,relayOff);
+      delay(delaycount); 
+    }
+  
+  // Turning Off Solinoid A0  and A4
+  digitalWrite(solinoid_WaterOut_WaterWash,0); //A1
+  delay(10);
+  digitalWrite(solinoid_WaterIn_from_waterTank,0); //A4
+  delay(10);  
   }
-
- }
 
 void Soap_drain() /////////////////////////////////////////////////////////////////////////////////////////////////
 {
@@ -197,9 +208,9 @@ void Soap_drain() //////////////////////////////////////////////////////////////
  */
 
     // Open water conenction to SoapTank  
-        digitalWrite(solinoid_WaterIn_from_waterTank,On);
+        digitalWrite(solinoid_Water_Out_To_SoapTank,On); // A4
         delay(15); // time to open the valve
-        digitalWrite(solinoid_Water_Out_To_SoapTank,On);
+        digitalWrite(solinoid_WaterIn_from_waterTank,On); // A0
         delay(15);
     
     // Fill soap tank with water     
@@ -209,31 +220,33 @@ void Soap_drain() //////////////////////////////////////////////////////////////
       delay(10);
 
     // Off the valve
-      digitalWrite(solinoid_WaterIn_from_waterTank,Off);
-      delay(15); // time to open the valve
       digitalWrite(solinoid_Water_Out_To_SoapTank,Off);
+      delay(15); // time to open the valve
+      digitalWrite(solinoid_WaterIn_from_waterTank,Off);
       delay(15);      
 
-    // at this stage soap tank already contains water
+    // at this stage soap tank already contains water and valve are closed
   
     // Fill soap tank with Soap     
-      digitalWrite(solinoid_Soap_Out_To_SoapTank,On);
+      digitalWrite(solinoid_Soap_Out_To_SoapTank,On); // A5
       delay(50); // time to fill the water on the soap tank
-      digitalWrite(solinoid_Soap_Out_To_SoapTank,Off);
+      digitalWrite(solinoid_Soap_Out_To_SoapTank,Off); // A5
       delay(10);
    
    // at this stage soap tank already contains Soap
         
-   // Turn the servo motor on to start mixing    
-      digitalWrite(ServoDataControl,On);
-      delay(500); // Turn the servo motors on then mixing soap and water
-      digitalWrite(ServoDataControl,Off);
-      delay(10);
-    
+   // Turn the servo motor on to start mixing
+      for (int i = 0; i < 50; i++)
+      {     
+        digitalWrite(ServoDataControl,On);
+        delay(10); // Turn the servo motors on then mixing soap and water
+        digitalWrite(ServoDataControl,Off);
+        delay(5);
+      }
   // Despense soap for washing
-       digitalWrite(solinoid_Soap_Out_for_Washing,On);
+       digitalWrite(solinoid_Soap_Out_for_Washing,On); // A3
        delay(10);
-       digitalWrite(solinoidWaterOut_To_Soap_Tank_for_Mixing,On);
+       digitalWrite(solinoidWaterOut_To_Soap_Tank_for_Mixing,On); // A2
        delay(10);       
        digitalWrite(relaySoap,On);
        delay(SoapDrainTime);
@@ -251,16 +264,17 @@ void Soap_drain() //////////////////////////////////////////////////////////////
 
 void Air_drain() /////////////////////////////////////////////////////////////////////////////////////
 {
-  
+
   int relayOn = 1;
   int relayOff = 0;
   int airDrainTime = 30; 
-  for (int i = 0; i < 7 ; i++) {
-  digitalWrite(relayAir,relayOn);
-  delay(airDrainTime); 
-  digitalWrite(relayAir,relayOff);  
-  delay(airDrainTime); 
-  }
+    for (int i = 0; i < 7 ; i++)
+    {
+      digitalWrite(relayAir,relayOn);
+      delay(airDrainTime); 
+      digitalWrite(relayAir,relayOff);  
+      delay(airDrainTime); 
+    }
 
 
   
@@ -268,12 +282,12 @@ void Air_drain() ///////////////////////////////////////////////////////////////
 
 
 void userdefineValue(int defWater, int defAir) //////////////////////////////////////////////////////////////////////
-{
+  {
   // This will be unlimited option for both air and water 
   // Soap needs to consider on what design is accepted. It will create a huge mixture of soap and water or one at a time depending on user request
-
-if ( defWater == 1)
-  {
+  
+  if ( defWater == 1)
+    {
     while (digitalRead(userdefinePin))
       {
         digitalWrite(relayWater,1);
@@ -281,11 +295,11 @@ if ( defWater == 1)
         digitalWrite(relayWater,0);
         delay(30); 
       }
-  }
-
-
-if ( defAir == 1)
-  {
+    }
+  
+  
+  if ( defAir == 1)
+    {
     while (digitalRead(userdefinePin))
       {
         digitalWrite(relayAir,1);
@@ -293,8 +307,8 @@ if ( defAir == 1)
         digitalWrite(relayAir,0);
         delay(40); 
       }
+    }
   }
-}
 
 void eepromReadData() //////////////////////////////////////////////////////////////////////
 {
@@ -313,8 +327,7 @@ void eepromReadData() //////////////////////////////////////////////////////////
 
 
 void epromReset() /////////////////////////////////////////////////////////////////////////////////////////////////
-{
-
+  {
   pinMode(11, OUTPUT);
   pinMode(5, OUTPUT); //pass pin
   pinMode(8, OUTPUT);
@@ -324,71 +337,73 @@ void epromReset() //////////////////////////////////////////////////////////////
   int FirstDigit = 0,SecondDigit = 0, ThirdDigit = 0;
   int pass1 = 5, pass2 = 1, pass3 = 9;
   int passcomplete  = 0;
-
-
+  
+  
   if (digitalRead(11) == 1)
   {
-    do { // first digit
-        if (digitalRead(5) == 1)
-        {
-          FirstDigit = FirstDigit + 1;
-          digitalWrite(10,1);
-          delay(80);
-          digitalWrite(10,0);
-        }
-      } while (FirstDigit != pass1);
-    
+  do{ // first digit
+    if (digitalRead(5) == 1)
+      {
+        FirstDigit = FirstDigit + 1;
+        digitalWrite(10,1);
+        delay(80);
+        digitalWrite(10,0);
+      }
+  }while (FirstDigit != pass1);
+  
+  }
+  if(FirstDigit == pass1)
+  {
+  digitalWrite(8,1);
+  passcomplete = 500;
+  }
+  
+  do{ // 2nd digit
+    if (digitalRead(5) == 1)
+    {
+      SecondDigit = SecondDigit + 1;
+      digitalWrite(10,1);
+      delay(80);
+      digitalWrite(10,0);
     }
-        if(FirstDigit == pass1)
-        {
-           digitalWrite(8,1);
-           passcomplete = 500;
-        }
-
-    do { // 2nd digit
-        if (digitalRead(5) == 1){
-          SecondDigit = SecondDigit + 1;
-          digitalWrite(10,1);
-          delay(80);
-          digitalWrite(10,0);
-        }
-      } while (SecondDigit != pass2);
-    
-    if(SecondDigit == pass2)
+  }while (SecondDigit != pass2);
+  
+  if(SecondDigit == pass2)
     {
       digitalWrite(9,1);
       passcomplete = passcomplete + 10;
     }
-
-    do { // 3rd digit
-        if (digitalRead(5) == 1){
-          ThirdDigit = ThirdDigit + 1;
-          digitalWrite(10,1);
-          delay(80);
-          digitalWrite(10,0);
-        }
-      } while (ThirdDigit != pass3);
-    
-    if(ThirdDigit == pass3)
+  
+  do{ // 3rd digit
+    if (digitalRead(5) == 1)
     {
-      passcomplete = passcomplete + 9;
+      ThirdDigit = ThirdDigit + 1;
+      digitalWrite(10,1);
+      delay(80);
+      digitalWrite(10,0);
     }
-
-if (passcomplete == EPROM_Protect)
+  }while (ThirdDigit != pass3);
+  
+  if(ThirdDigit == pass3)
   {
-  EEPROM.update(EEPROM_Transaction_ADR, 0);
-      for (int i = 0; i < 10; i++) {
-          digitalWrite(CoinIndicatorLight,1);
-          delay (7);
-          digitalWrite(CoinIndicatorLight,0);
-          delay (7);
+  passcomplete = passcomplete + 9;
+  }
+  
+  if (passcomplete == EPROM_Protect)
+    {
+    EEPROM.update(EEPROM_Transaction_ADR, 0);
+    for (int i = 0; i < 10; i++) 
+      {
+        digitalWrite(CoinIndicatorLight,1);
+        delay (7);
+        digitalWrite(CoinIndicatorLight,0);
+        delay (7);
       }
     }
-}
+  }
 
 
 void loop() {
-
   int coinslot = 0;
   coinslot = digitalRead(coinPin);
   if (digitalRead(resetpasskey) == 1 && coinslot == 1)
