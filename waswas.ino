@@ -12,6 +12,7 @@
   int soapPin = 2; // IC PIN 4 soap washing button
   int airPin = 3; // IC PIN 5 Air service button
   int userdefinePin = 4; //IC PIN 6 anything the user wants but not open to public. This is for personal used
+  
 
   int CoinIndicatorLight = 6; // Pin 12 notify the user if the coin is accepted else light is off.
   int ServoDataControl = 7; // Pin 13 control the servo motors during mixing
@@ -23,10 +24,12 @@
   
     
   int resetpasskey = 11; // IC Pin 17 Keyinput for EEPROM reset
-  int EEPROMFlag = true; // This will control the EEPROM DATA. true = write, false = not
-  int limitUsage = 30; // the limit of usage on how many times you can use the service else device is unusable.
+  int EEPROMFlag = false; // This will control the EEPROM DATA. true = write, false = not
+  int limitUsage = 5; // the limit of usage on how many times you can use the service else device is unusable.
   int EEPROM_Transaction_ADR = 10; // EEPROM address where data transaction counter is stored.
   int EPROM_Protect = 519; // uriel m wenceslao
+
+  
 
   int solinoid_WaterIn_from_waterTank = A0;// analog IC PIN23 solinoid to control the open and close of the water tank
   int solinoid_WaterOut_WaterWash = A1;// analog IC PIN24  solinoid to control the water out for washing
@@ -50,12 +53,20 @@ void setup() {
   pinMode(relaySoap, OUTPUT);
   pinMode(relayAir, OUTPUT);
   pinMode(ServoDataControl,OUTPUT);
+  
   pinMode(solinoid_WaterIn_from_waterTank,OUTPUT); //A0
   pinMode(solinoid_WaterOut_WaterWash,OUTPUT); //A1
   pinMode(solinoidWaterOut_To_Soap_Tank_for_Mixing,OUTPUT); //A2
   pinMode(solinoid_Soap_Out_for_Washing,OUTPUT); //A3
   pinMode(solinoid_Water_Out_To_SoapTank,OUTPUT); //A4
   pinMode(solinoid_Soap_Out_To_SoapTank,OUTPUT); //A5
+
+  digitalWrite(solinoid_WaterIn_from_waterTank,LOW); //A0
+  digitalWrite(solinoid_WaterOut_WaterWash,LOW); //A1
+  digitalWrite(solinoidWaterOut_To_Soap_Tank_for_Mixing,LOW); //A2
+  digitalWrite(solinoid_Soap_Out_for_Washing,LOW); //A3
+  digitalWrite(solinoid_Water_Out_To_SoapTank,LOW); //A4
+  digitalWrite(solinoid_Soap_Out_To_SoapTank,LOW); //A5
 
  // Serial.begin(9600); 
 }
@@ -175,9 +186,9 @@ void Water_drain() /////////////////////////////////////////////////////////////
   
   // Turning On Solinoid A0  and A4
   digitalWrite(solinoid_WaterOut_WaterWash,1); //A1
-  delay(10);
+  delay(200);
   digitalWrite(solinoid_WaterIn_from_waterTank,1); //A4
-  delay(10);
+  delay(80);
   for (int i = 0; i < 7 ; i++)
     {
       digitalWrite(relayWater,relayOn);
@@ -196,7 +207,10 @@ void Water_drain() /////////////////////////////////////////////////////////////
 void Soap_drain() /////////////////////////////////////////////////////////////////////////////////////////////////
 {
   int On = 1, Off = 0;
+  int solinoidDalay_On_Off = 100;
   int SoapDrainTime = 300; 
+  int analogPinValueOn  = HIGH;
+  int analogPinValueOff  = LOW;
   
 /*
   pinMode(solinoid_WaterIn_from_waterTank,OUTPUT); //A0
@@ -208,10 +222,10 @@ void Soap_drain() //////////////////////////////////////////////////////////////
  */
 
     // Open water conenction to SoapTank  
-        digitalWrite(solinoid_Water_Out_To_SoapTank,On); // A4
-        delay(15); // time to open the valve
-        digitalWrite(solinoid_WaterIn_from_waterTank,On); // A0
-        delay(15);
+      digitalWrite(solinoid_Water_Out_To_SoapTank,analogPinValueOn); // A4
+      delay(solinoidDalay_On_Off); // time to open the valve
+      digitalWrite(solinoid_WaterIn_from_waterTank,analogPinValueOn); // A0
+      delay(solinoidDalay_On_Off);
     
     // Fill soap tank with water     
       digitalWrite(relayWater,On);
@@ -220,18 +234,18 @@ void Soap_drain() //////////////////////////////////////////////////////////////
       delay(10);
 
     // Off the valve
-      digitalWrite(solinoid_Water_Out_To_SoapTank,Off);
-      delay(15); // time to open the valve
-      digitalWrite(solinoid_WaterIn_from_waterTank,Off);
-      delay(15);      
+      digitalWrite(solinoid_Water_Out_To_SoapTank,analogPinValueOff);
+      delay(solinoidDalay_On_Off); // time to open the valve
+      digitalWrite(solinoid_WaterIn_from_waterTank,analogPinValueOff);
+      delay(solinoidDalay_On_Off);      
 
     // at this stage soap tank already contains water and valve are closed
   
     // Fill soap tank with Soap     
-      digitalWrite(solinoid_Soap_Out_To_SoapTank,On); // A5
+      digitalWrite(solinoid_Soap_Out_To_SoapTank,analogPinValueOn); // A5
       delay(50); // time to fill the water on the soap tank
-      digitalWrite(solinoid_Soap_Out_To_SoapTank,Off); // A5
-      delay(10);
+      digitalWrite(solinoid_Soap_Out_To_SoapTank,analogPinValueOff); // A5
+      delay(solinoidDalay_On_Off);
    
    // at this stage soap tank already contains Soap
         
@@ -244,18 +258,18 @@ void Soap_drain() //////////////////////////////////////////////////////////////
         delay(5);
       }
   // Despense soap for washing
-       digitalWrite(solinoid_Soap_Out_for_Washing,On); // A3
-       delay(10);
-       digitalWrite(solinoidWaterOut_To_Soap_Tank_for_Mixing,On); // A2
-       delay(10);       
+       digitalWrite(solinoid_Soap_Out_for_Washing,analogPinValueOn); // A3
+       delay(solinoidDalay_On_Off);
+       digitalWrite(solinoidWaterOut_To_Soap_Tank_for_Mixing,analogPinValueOn); // A2
+       delay(solinoidDalay_On_Off);       
        digitalWrite(relaySoap,On);
        delay(SoapDrainTime);
        digitalWrite(relaySoap,Off);      
        delay(15);
-       digitalWrite(solinoid_Soap_Out_for_Washing,Off);
-       delay(10);
-       digitalWrite(solinoidWaterOut_To_Soap_Tank_for_Mixing,Off);
-       delay(10);
+       digitalWrite(solinoid_Soap_Out_for_Washing,analogPinValueOff);
+       delay(solinoidDalay_On_Off);
+       digitalWrite(solinoidWaterOut_To_Soap_Tank_for_Mixing,analogPinValueOff);
+       delay(solinoidDalay_On_Off);
 
        ////Happy day
         
@@ -345,9 +359,9 @@ void epromReset() //////////////////////////////////////////////////////////////
     if (digitalRead(5) == 1)
       {
         FirstDigit = FirstDigit + 1;
-        digitalWrite(10,1);
+        digitalWrite(CoinIndicatorLight,1);
         delay(80);
-        digitalWrite(10,0);
+        digitalWrite(CoinIndicatorLight,0);
       }
   }while (FirstDigit != pass1);
   
@@ -362,9 +376,9 @@ void epromReset() //////////////////////////////////////////////////////////////
     if (digitalRead(5) == 1)
     {
       SecondDigit = SecondDigit + 1;
-      digitalWrite(10,1);
+      digitalWrite(CoinIndicatorLight,1);
       delay(80);
-      digitalWrite(10,0);
+      digitalWrite(CoinIndicatorLight,0);
     }
   }while (SecondDigit != pass2);
   
@@ -378,11 +392,12 @@ void epromReset() //////////////////////////////////////////////////////////////
     if (digitalRead(5) == 1)
     {
       ThirdDigit = ThirdDigit + 1;
-      digitalWrite(10,1);
+      digitalWrite(CoinIndicatorLight,1);
       delay(80);
-      digitalWrite(10,0);
+      digitalWrite(CoinIndicatorLight,0);
     }
   }while (ThirdDigit != pass3);
+        digitalWrite(10,1);
   
   if(ThirdDigit == pass3)
   {
@@ -406,7 +421,8 @@ void epromReset() //////////////////////////////////////////////////////////////
 void loop() {
   int coinslot = 0;
   coinslot = digitalRead(coinPin);
-  if (digitalRead(resetpasskey) == 1 && coinslot == 1)
+  
+ if (digitalRead(resetpasskey) == 1 && coinslot == 1)
     eepromReadData();
 
   if (digitalRead(resetpasskey) == 1 &&  digitalRead(userdefinePin) == 1)
@@ -414,4 +430,7 @@ void loop() {
   
   if (coinslot == 1 && digitalRead(resetpasskey) == 0)  
     optionSelect(coinslot);  
+ 
+
+   
 }
