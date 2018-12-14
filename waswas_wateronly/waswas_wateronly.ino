@@ -7,7 +7,7 @@
     
     
 
-    int milliseconds_realTime = 1; // this needs to be set to 1000 in the actual hardware
+    int milliseconds_realTime = 1; // the loop method execute at exactly .0001 milliseconds per cycle
     
     /*
      this setting will set on what is hardware that will run
