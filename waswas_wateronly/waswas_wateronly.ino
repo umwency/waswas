@@ -3,7 +3,7 @@
 #include <EEPROM.h>
     int TimeSettingPerWas = 1; // Total washing duration time - change on how many munites the total washing during per cycle
     int StandardSeconds = 5; // 1 minutes in 60 seconds // change it to 60 on actual hardware
-    int StandardMilliseconds = 60; // 1 seconds is 1000 millisecods and the loop is rotating ones every milliseconds;
+    int StandardMilliseconds = 50; // 1 seconds is 1000 millisecods and the loop is rotating ones every milliseconds;
     
     
 
@@ -78,7 +78,7 @@
     /*
      * Soap Time despensing
      */
-    int soapdespenseTimer = 10; // this is express in secondes
+    int soapdespenseTime = 2; // this is express in secondes
     int soapSeconds_delay = 0;
     int soapMillisencods_delay = 0; // this should be set to 1000 in actual hardware - 1 seconds is equal to 1000 ms
 
@@ -168,47 +168,26 @@ if (!waterIndicator_one || !waterIndicator_two || !waterIndicator_three || !soap
 //============START Soap  ========================
 //Time counter for button 1
   if(soapIndicator && soapFlag) 
-  {
+    {
     
-      //if (soapdespenseTimer != soapSeconds_delay)
+     soapMillisencods_delay++;
      digitalWrite(soapPin_Despense,on);
-     if (soapSeconds_delay == 5)
-     {
-       digitalWrite(soapPin_Despense,off);
-       soapIndicator = false;
-     }
-    soapMillisencods_delay++;
-
-        if (soapMillisencods_delay == StandardMilliseconds)
-        {
-          milliseconds_delay_1 = 0;
-          soapSeconds_delay++;
-        }
      
-     /*
-     if (soapSeconds_delay == soapdespenseTimer)
-        {
-         digitalWrite(soapPin_Despense,on);   
-         soapIndicator = false; 
-         //soapMillisencods_delay = 0;
-         //soapSeconds_delay = 0;
-        }
-         
-         soapMillisencods_delay++;  // setting timer for each service in milliseconds counting
+    if (soapSeconds_delay == soapdespenseTime)
+      {
+        digitalWrite(soapPin_Despense,off);
+        soapMillisencods_delay = 0;
+        soapSeconds_delay = 0;
+        soapIndicator = false;
+      }
      
-      if (soapMillisencods_delay == StandardMilliseconds)
-        {
-          milliseconds_delay_1 = 0;
-          soapSeconds_delay++;
-        }
-
-        */
-     }
+    if (soapMillisencods_delay == StandardMilliseconds)
+      {
+        soapMillisencods_delay = 0;
+        soapSeconds_delay++;
+      }  
+    }
 //============END Soap ========================
-
-
-
-
 
        
 //============START BUTTON 1 ========================
@@ -317,6 +296,9 @@ if (!waterIndicator_one || !waterIndicator_two || !waterIndicator_three || !soap
   }
 //============END BUTTON 3 ========================
 
+
+
+
 //controlling water relay on/off
   if ((waterIndicator_one || waterIndicator_two || waterIndicator_three) && waterFlag)
   
@@ -326,8 +308,9 @@ if (!waterIndicator_one || !waterIndicator_two || !waterIndicator_three || !soap
 
     //Enabling timer delay cycle... each cycle is 1 milliseconds
     delay(milliseconds_realTime);
-}
 
+
+}
 
 void mixingprocessSoap()
 {
@@ -341,7 +324,7 @@ void mixingprocessSoap()
  delay(timerWater_Despense_to_mixing);
  digitalWrite(WaterSoap,off);
  delay(10); 
- 
+ /*
  digitalWrite(LiquidSoap,on);
  delay(timerSoap_Despense_to_mixing);
  digitalWrite(LiquidSoap,off);
@@ -351,7 +334,9 @@ void mixingprocessSoap()
  delay(timerMixingProcess);
  digitalWrite(MixingProcess,off);
  delay(10);
-
+ */
  digitalWrite(Mixingindicator,off);
  delay(20);
+
+
 }
