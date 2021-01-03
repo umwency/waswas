@@ -3,6 +3,7 @@
 #include <Wire.h>
 #define eeprom 0x50 //defines the base address of the EEPROM
 
+int resetEPROMContent = 4;
 int ViewEPROMContent = 5;
 int pinInput = 6;
 int pinOutput = 8;
@@ -15,11 +16,12 @@ int pressCount = 0;
 void setup() {
   Wire.begin(); 
   Serial.begin(9600);
+  pinMode(resetEPROMContent, INPUT);
   pinMode(ViewEPROMContent, INPUT);
   pinMode(pinInput, INPUT);
   pinMode(pinOutput, OUTPUT);
   digitalWrite(pinOutput, initValue);
-  if(EEprom_ReadData(eeprom,EEPROM_Read_And_Write_address) == 0) // if no data available else skip
+  if(digitalRead(resetEPROMContent) == 1) // if no data available else skip
     EEprom_WriteData(initValue,eeprom,EEPROM_Read_And_Write_address);
 }
 
@@ -32,10 +34,11 @@ void loop() {
     if (buttonCheck && !pressCount)   
      {
        EEprom_WriteData(EEprom_ReadData(eeprom,EEPROM_Read_And_Write_address) + 1,eeprom,EEPROM_Read_And_Write_address);
-       Serial.print("EEProm Data: ");
+       Serial.print("\n EEProm Data: ");
        Serial.print(EEprom_ReadData(eeprom,EEPROM_Read_And_Write_address));
        digitalWrite(pinOutput,1); 
        pressCount = 1;
+       buttonCheck = false;
         
      }
  }   
@@ -46,6 +49,19 @@ void loop() {
         
     }
 
+   if(digitalRead(ViewEPROMContent) == 1) 
+   {
+      int content = EEprom_ReadData(eeprom,EEPROM_Read_And_Write_address);
+      for (int i = 0; i < content; i++) {
+      digitalWrite(pinOutput,1); 
+      delay(1000);
+      digitalWrite(pinOutput,0);
+      delay(1000); 
+      }
+    
+   }
+
+  
 }
 void EEprom_WriteData(int data, int EpromBase_Address, int WritingAddress){
   Wire.beginTransmission(EpromBase_Address);
